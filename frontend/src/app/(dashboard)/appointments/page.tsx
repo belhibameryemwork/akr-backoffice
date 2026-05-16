@@ -13,6 +13,7 @@ export default function AppointmentsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -65,6 +66,10 @@ export default function AppointmentsPage() {
         setError('Failed to delete appointment.');
       }
     }
+  };
+
+  const handleView = (apt: any) => {
+    setSelectedAppointment(apt);
   };
 
   const getStatusClass = (status: string) => {
@@ -146,10 +151,11 @@ export default function AppointmentsPage() {
                 </td>
                 <td>
                   <div className={styles.actions}>
+                    <button className={styles.actionBtn} onClick={() => handleView(apt)} title="View Details">👁️</button>
                     <Link href={`/appointments/edit/${apt.id}`}>
-                      <button className={styles.actionBtn}>✏️</button>
+                      <button className={styles.actionBtn} title="Edit Appointment">✏️</button>
                     </Link>
-                    <button className={styles.actionBtn} onClick={() => handleDelete(apt.id)}>🗑️</button>
+                    <button className={styles.actionBtn} onClick={() => handleDelete(apt.id)} title="Delete Appointment">🗑️</button>
                   </div>
                 </td>
               </tr>
@@ -175,6 +181,32 @@ export default function AppointmentsPage() {
           >
             Next
           </button>
+        </div>
+      )}
+
+      {selectedAppointment && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedAppointment(null)}>
+          <div className={`glass ${styles.modalContent}`} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Appointment Details</h2>
+              <button className={styles.closeBtn} onClick={() => setSelectedAppointment(null)}>&times;</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.detailRow}><span className={styles.detailLabel}>Client:</span> {selectedAppointment.clientName}</div>
+              <div className={styles.detailRow}><span className={styles.detailLabel}>Email:</span> {selectedAppointment.email}</div>
+              <div className={styles.detailRow}><span className={styles.detailLabel}>Phone:</span> {selectedAppointment.phone}</div>
+              <div className={styles.detailRow}><span className={styles.detailLabel}>Service:</span> {selectedAppointment.service}</div>
+              <div className={styles.detailRow}><span className={styles.detailLabel}>Date & Time:</span> {selectedAppointment.date} at {selectedAppointment.time}</div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Status:</span> 
+                <span className={`${styles.statusBadge} ${getStatusClass(selectedAppointment.status)}`}>{selectedAppointment.status}</span>
+              </div>
+              <div className={styles.notesSection}>
+                <div className={styles.detailLabel}>Notes:</div>
+                <div className={styles.notesText}>{selectedAppointment.notes || 'No notes provided.'}</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

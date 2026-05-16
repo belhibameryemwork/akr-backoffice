@@ -74,13 +74,15 @@ export const createAppointment = async (req: Request, res: Response): Promise<vo
 export const updateAppointment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const data = req.body;
+    const { clientName, email, phone, service, date, time, status, notes } = req.body;
+    
     const appointment = await prisma.appointment.update({
       where: { id: Number(id) },
-      data
+      data: { clientName, email, phone, service, date, time, status, notes }
     });
     res.json(appointment);
   } catch (error) {
+    console.error('Update appointment error:', error);
     res.status(500).json({ error: 'Failed to update appointment' });
   }
 };
