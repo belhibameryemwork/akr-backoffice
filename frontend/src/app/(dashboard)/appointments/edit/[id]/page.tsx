@@ -9,6 +9,7 @@ export default function EditAppointmentPage({ params }: { params: Promise<{ id: 
   const router = useRouter();
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     clientName: '',
     email: '',
@@ -36,9 +37,9 @@ export default function EditAppointmentPage({ params }: { params: Promise<{ id: 
             status: data.status || 'PENDING'
           });
         }
-      } catch (error) {
-        console.error('Failed to fetch appointment', error);
-        alert('Failed to load appointment details');
+      } catch (err) {
+        console.error('Failed to fetch appointment', err);
+        setError('Failed to load appointment details');
       } finally {
         setLoading(false);
       }
@@ -58,9 +59,9 @@ export default function EditAppointmentPage({ params }: { params: Promise<{ id: 
         body: JSON.stringify(formData)
       });
       router.push('/appointments');
-    } catch (error) {
-      console.error('Failed to update appointment', error);
-      alert('Failed to update appointment');
+    } catch (err: any) {
+      console.error('Failed to update appointment', err);
+      setError(err.message || 'Failed to update appointment. Please check your inputs and try again.');
     }
   };
 
@@ -81,6 +82,7 @@ export default function EditAppointmentPage({ params }: { params: Promise<{ id: 
       </div>
 
       <div className={`glass ${styles.formCard}`}>
+        {error && <div style={{ color: 'var(--danger)', padding: '1rem', marginBottom: '1.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{error}</div>}
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.grid}>
             <div className={styles.inputGroup}>

@@ -13,6 +13,7 @@ export default function NewUserPage() {
     role: 'AGENT',
     password: ''
   });
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,9 +27,9 @@ export default function NewUserPage() {
         body: JSON.stringify(formData)
       });
       router.push('/users');
-    } catch (error) {
-      console.error('Failed to create user', error);
-      alert('Failed to create user');
+    } catch (err: any) {
+      console.error('Failed to create user', err);
+      setError(err.message || 'Failed to create user. Please check your inputs and try again.');
     }
   };
 
@@ -45,6 +46,7 @@ export default function NewUserPage() {
       </div>
 
       <div className={`glass ${styles.formCard}`}>
+        {error && <div style={{ color: 'var(--danger)', padding: '1rem', marginBottom: '1.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{error}</div>}
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.grid}>
             <div className={styles.inputGroup}>

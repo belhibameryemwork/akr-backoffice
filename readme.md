@@ -1,63 +1,108 @@
 # AKR Smart Consulting - Back-Office Application
 
-This repository contains the Back-Office application for appointment and user management at AKR Smart Consulting.
+Bienvenue sur le dépôt du projet Back-Office d'AKR Smart Consulting. Cette application sur mesure a été conçue pour optimiser et simplifier la gestion interne de l'entreprise. Elle offre une interface élégante et réactive permettant d'administrer les utilisateurs, de suivre les rendez-vous clients, et d'analyser l'activité via un tableau de bord dynamique.
 
-## Technology Stack
+## 🚀 Fonctionnalités Principales
 
-This project is built using a modern, robust, and highly productive technology stack:
+- **Authentification Sécurisée & Autorisation**
+  - Connexion via JSON Web Tokens (JWT).
+  - Gestion des rôles avec contrôle d'accès : **ADMIN** (accès complet, gestion des utilisateurs) et **AGENT** (accès limité aux rendez-vous et au tableau de bord).
 
-### Frontend
-- **Framework:** Next.js (React)
-- **Styling:** Vanilla CSS / CSS Modules (Premium UI design with custom animations)
-- **State Management:** React Context API & Hooks
+- **Tableau de Bord (Dashboard) Dynamique**
+  - Statistiques en temps réel : nombre total de rendez-vous, confirmés, en attente et annulés.
+  - Graphique de répartition visuel interactif.
+  - Flux d'activité récent (affichage des 5 dernières actions).
 
-### Backend
-- **Framework:** Node.js with Express.js
-- **Database:** PostgreSQL
-- **ORM:** Prisma
-- **Authentication:** JSON Web Tokens (JWT)
+- **Gestion des Rendez-vous (Appointments)**
+  - CRUD complet (Création, Lecture, Modification, Suppression).
+  - Pagination côté serveur pour optimiser les performances.
+  - Recherche par nom de client et filtrage par statut (Confirmé, En attente, Annulé).
 
-### General
-- **Language:** TypeScript
-- **Version Control:** Git
+- **Gestion des Utilisateurs (Users) - *Admins Uniquement***
+  - CRUD complet pour gérer l'équipe.
+  - Recherche dynamique par nom et filtrage par rôle (Admin, Agent).
 
-## Development Roadmap (10 Days)
+- **Expérience Utilisateur (UX) Premium**
+  - Design moderne (Glassmorphism), animations fluides, et gestion des erreurs intégrée (alertes inline, feedback visuel).
 
-### Phase 1: Foundation & Backend (Days 1-4)
-- **Day 1: Project Setup & Architecture**
-  - Initialize Git repository and project structure.
-  - Setup Next.js frontend and Node/Express backend environments.
-  - Configure PostgreSQL database and Prisma ORM.
-- **Day 2: Authentication & User Management APIs**
-  - Implement JWT authentication (Login/Logout).
-  - Build User API (CRUD operations, Role-based access).
-- **Day 3-4: Appointments API**
-  - Develop Appointments API (CRUD operations).
-  - Implement server-side filtering, search, and pagination.
+---
 
-### Phase 2: Frontend Implementation (Days 5-8)
-- **Day 5: Core Layout & Authentication UI**
-  - Setup global CSS and premium design system.
-  - Implement Login page and protected routes.
-  - Build main application layout (Sidebar, Header).
-- **Day 6: Dashboard & Statistics**
-  - Connect to backend APIs for overall statistics.
-  - Build Dashboard UI (Total, Confirmed, Pending, Cancelled appointments).
-- **Day 7: Appointments Management UI**
-  - Build Appointments List view.
-  - Implement UI for adding, editing, deleting, and searching appointments.
-- **Day 8: User Management UI & Final Integrations**
-  - Build User management interface.
-  - Ensure seamless frontend/backend integration and error handling.
+## 🛠️ Stack Technique
 
-### Phase 3: Polish & Delivery (Days 9-10)
-- **Day 9: UI/UX Refinement**
-  - Perform complete design review.
-  - Add micro-animations and ensure responsive layout.
-- **Day 10: Finalization & Delivery**
-  - Code cleanup, write comprehensive documentation.
-  - Record demonstration video and prepare repository handover.
+Ce projet s'appuie sur une architecture robuste séparant le front-end du back-end, entièrement typée grâce à TypeScript :
 
-## Getting Started
+### Front-end
+- **Framework :** [Next.js](https://nextjs.org/) (React)
+- **Langage :** TypeScript
+- **Styling :** CSS Modules (Vanilla CSS avec variables globales, sans dépendances lourdes pour des performances optimales)
+- **Routage :** App Router de Next.js
 
-*(Instructions for local setup, environment variables, and running the application will be added as the project is initialized)*
+### Back-end
+- **Framework :** [Node.js](https://nodejs.org/) avec [Express.js](https://expressjs.com/)
+- **Langage :** TypeScript
+- **Base de données :** PostgreSQL
+- **ORM :** [Prisma](https://www.prisma.io/)
+- **Sécurité :** `bcryptjs` pour le hachage des mots de passe, `jsonwebtoken` pour la sécurisation des routes, et `cors` pour la communication inter-origines.
+
+---
+
+## ⚙️ Installation & Démarrage en Local
+
+### Prérequis
+- [Node.js](https://nodejs.org/) (version 18+ recommandée)
+- [PostgreSQL](https://www.postgresql.org/) installé et en cours d'exécution localement ou via un service cloud (ex: Supabase, Neon).
+
+### 1. Cloner le projet
+```bash
+git clone <votre-url-de-depot>
+cd akr-backoffice
+```
+
+### 2. Configuration du Back-end
+```bash
+cd backend
+npm install
+```
+Créez un fichier `.env` à la racine du dossier `backend` et configurez vos variables :
+```env
+PORT=5000
+JWT_SECRET="votre_cle_secrete_super_securisee"
+DATABASE_URL="postgresql://utilisateur:motdepasse@localhost:5432/akr-backoffice"
+DIRECT_URL="postgresql://utilisateur:motdepasse@localhost:5432/akr-backoffice"
+FRONTEND_URL="http://localhost:3000"
+```
+Initialisez la base de données et peuplez-la avec l'utilisateur Administrateur par défaut :
+```bash
+npx prisma generate
+npx prisma db push
+npx prisma db seed  # Crée un premier compte Admin pour vous connecter
+```
+Démarrez le serveur de développement :
+```bash
+npm run dev
+```
+*Le serveur tournera par défaut sur http://localhost:5000.*
+
+### 3. Configuration du Front-end
+Ouvrez un nouveau terminal et naviguez vers le dossier front-end :
+```bash
+cd frontend
+npm install
+```
+Créez un fichier `.env.local` à la racine du dossier `frontend` :
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
+Démarrez l'application front-end :
+```bash
+npm run dev
+```
+*L'application sera accessible sur http://localhost:3000.*
+
+---
+
+## 👨‍💻 Identifiants par Défaut
+Après avoir exécuté la commande `npx prisma db seed` côté back-end, vous pourrez vous connecter avec les identifiants générés dans votre script de seed (par exemple `admin@akr.com` / `password123` ou selon la configuration de votre projet).
+
+---
+*Développé avec soin pour AKR Smart Consulting.*

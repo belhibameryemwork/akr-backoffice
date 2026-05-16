@@ -9,6 +9,10 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -16,15 +20,20 @@ export default function AppointmentsPage() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (statusFilter && statusFilter !== 'ALL') params.append('status', statusFilter);
+      params.append('page', page.toString());
 
       const result = await apiRequest(`/appointments?${params.toString()}`);
       if (result && result.data) {
         setAppointments(result.data);
+        if (result.pagination) {
+          setTotalPages(result.pagination.totalPages);
+        }
       } else if (Array.isArray(result)) {
         setAppointments(result);
       }
     } catch (err) {
       console.error("Failed to fetch:", err);
+      setError('Failed to fetch appointments.');
     } finally {
       setLoading(false);
     }
@@ -32,15 +41,28 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     fetchAppointments();
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, page]);
+
+  // Reset page when filters change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setPage(1);
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+    setPage(1);
+  };
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this appointment?')) {
       try {
         await apiRequest(`/appointments/${id}`, { method: 'DELETE' });
+        setSuccess('Appointment deleted successfully.');
         fetchAppointments();
       } catch (err) {
         console.error("Failed to delete:", err);
+        setError('Failed to delete appointment.');
       }
     }
   };
@@ -66,6 +88,9 @@ export default function AppointmentsPage() {
         </Link>
       </div>
 
+      {error && <div style={{ color: 'var(--danger)', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{error}</div>}
+      {success && <div style={{ color: 'var(--success)', padding: '1rem', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{success}</div>}
+
       <div className={styles.filters}>
         <div className={styles.searchGroup}>
           <input 
@@ -73,14 +98,14 @@ export default function AppointmentsPage() {
             placeholder="Search client name..." 
             className={styles.searchInput} 
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
         <div className={styles.filterGroup}>
           <select 
             className={styles.selectInput}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={handleFilterChange}
           >
             <option value="ALL">All Status</option>
             <option value="PENDING">Pending</option>
@@ -132,6 +157,26 @@ export default function AppointmentsPage() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.paginationContainer}>
+          <button 
+            className={styles.paginationBtn} 
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
+          <button 
+            className={styles.paginationBtn} 
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -115,6 +115,32 @@
   background-color: var(--bg-color);
 }
 
+.filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.searchInput, .selectInput {
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-md, 0.5rem);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.searchInput:focus, .selectInput:focus {
+  border-color: var(--primary-color);
+}
+
+.searchInput {
+  flex: 1;
+  max-width: 300px;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

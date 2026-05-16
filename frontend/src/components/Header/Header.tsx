@@ -18,21 +18,11 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         <button className={styles.menuBtn} onClick={onMenuClick}>
           ☰
         </button>
-        <div className={styles.searchContainer}>
-          <span className={styles.searchIcon}>🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search appointments, users..." 
-            className={styles.searchInput} 
-          />
-        </div>
+
       </div>
       
       <div className={styles.actions}>
-        <button className={styles.notificationBtn}>
-          🔔
-          <span className={styles.badge}>3</span>
-        </button>
+
         <div className={styles.profile}>
           <div className={styles.avatar}>
             {user ? user.name.charAt(0).toUpperCase() : 'A'}

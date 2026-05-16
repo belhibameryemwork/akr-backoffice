@@ -17,7 +17,8 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -78,13 +79,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className={styles.actions}>
-            <label className={styles.checkboxContainer}>
-              <input type="checkbox" className={styles.checkbox} />
-              <span className={styles.checkboxLabel}>Remember me</span>
-            </label>
-            <a href="#" className={styles.forgotPassword}>Forgot password?</a>
-          </div>
+
 
           <button type="submit" className={`btn-primary ${styles.submitBtn}`}>
             Sign In

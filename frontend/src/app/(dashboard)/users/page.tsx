@@ -8,6 +8,8 @@ import styles from './page.module.css';
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
 
   const router = useRouter();
 
@@ -61,6 +63,25 @@ export default function UsersPage() {
         </Link>
       </div>
 
+      <div className={styles.filters}>
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={styles.searchInput}
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className={styles.selectInput}
+        >
+          <option value="">All Roles</option>
+          <option value="ADMIN">Admin</option>
+          <option value="AGENT">Agent</option>
+        </select>
+      </div>
+
       <div className={`glass ${styles.tableContainer}`}>
         <table className={styles.table}>
           <thead>
@@ -75,7 +96,11 @@ export default function UsersPage() {
           <tbody>
             {loading ? (
               <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>Loading...</td></tr>
-            ) : users.map((user) => (
+            ) : users.filter(user => {
+              const matchesName = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+              const matchesRole = roleFilter ? user.role === roleFilter : true;
+              return matchesName && matchesRole;
+            }).map((user) => (
               <tr key={user.id}>
                 <td className={styles.userName}>
                   <div className={styles.userCell}>

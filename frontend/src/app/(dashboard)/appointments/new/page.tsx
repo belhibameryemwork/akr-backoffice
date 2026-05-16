@@ -16,6 +16,7 @@ export default function NewAppointmentPage() {
     time: '',
     notes: ''
   });
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,9 +30,9 @@ export default function NewAppointmentPage() {
         body: JSON.stringify(formData)
       });
       router.push('/appointments');
-    } catch (error) {
-      console.error('Failed to create appointment', error);
-      alert('Failed to create appointment');
+    } catch (err: any) {
+      console.error('Failed to create appointment', err);
+      setError(err.message || 'Failed to create appointment. Please check your inputs and try again.');
     }
   };
 
@@ -48,6 +49,7 @@ export default function NewAppointmentPage() {
       </div>
 
       <div className={`glass ${styles.formCard}`}>
+        {error && <div style={{ color: 'var(--danger)', padding: '1rem', marginBottom: '1.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{error}</div>}
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.grid}>
             <div className={styles.inputGroup}>

@@ -9,6 +9,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   const router = useRouter();
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,9 +29,9 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
             password: '' // Keep empty to not update unless typed
           });
         }
-      } catch (error) {
-        console.error('Failed to fetch user', error);
-        alert('Failed to load user details');
+      } catch (err) {
+        console.error('Failed to fetch user', err);
+        setError('Failed to load user details');
       } finally {
         setLoading(false);
       }
@@ -60,9 +61,9 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
         body: JSON.stringify(payload)
       });
       router.push('/users');
-    } catch (error) {
-      console.error('Failed to update user', error);
-      alert('Failed to update user');
+    } catch (err: any) {
+      console.error('Failed to update user', err);
+      setError(err.message || 'Failed to update user. Please check your inputs and try again.');
     }
   };
 
@@ -83,6 +84,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       </div>
 
       <div className={`glass ${styles.formCard}`}>
+        {error && <div style={{ color: 'var(--danger)', padding: '1rem', marginBottom: '1.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--border-radius-md)' }}>{error}</div>}
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.grid}>
             <div className={styles.inputGroup}>

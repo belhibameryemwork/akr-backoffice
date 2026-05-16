@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -20,6 +20,11 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
         localStorage.removeItem('token');
         window.location.href = '/login';
         return null;
+    }
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
     }
     
     // If the response is 204 No Content, don't try to parse JSON
