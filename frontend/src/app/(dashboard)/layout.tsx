@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Header from '@/components/Header/Header';
 import styles from './layout.module.css';
@@ -10,6 +11,21 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
+  if (!isAuthorized) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <div className={styles.layout}>

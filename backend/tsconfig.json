@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    /* Configuration de base */
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
+    /* Chemins des fichiers */
+    "rootDir": "./",
+    "outDir": "./dist",
+    /* Options de sortie */
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react-jsx",
+    /* Rigueur et Typage */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    /* Performance et compatibilité */
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "src/**/*",
+    "prisma/**/*",
+    "prisma.config.ts",
+    ".env"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

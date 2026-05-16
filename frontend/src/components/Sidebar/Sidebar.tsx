@@ -1,7 +1,27 @@
+'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
+  const router = useRouter();
+  const [userRole, setUserRole] = useState<string>('AGENT');
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserRole(user.role);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoContainer}>
@@ -26,17 +46,19 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
               Appointments
             </Link>
           </li>
-          <li>
-            <Link href="/users" className={styles.navItem} onClick={onClose}>
-              <span className={styles.icon}>👥</span>
-              Users
-            </Link>
-          </li>
+          {userRole === 'ADMIN' && (
+            <li>
+              <Link href="/users" className={styles.navItem} onClick={onClose}>
+                <span className={styles.icon}>👥</span>
+                Users
+              </Link>
+            </li>
+          )}
         </ul>
       </nav>
       
       <div className={styles.footer}>
-        <button className={styles.logoutBtn}>
+        <button className={styles.logoutBtn} onClick={handleLogout}>
           <span className={styles.icon}>🚪</span>
           Logout
         </button>

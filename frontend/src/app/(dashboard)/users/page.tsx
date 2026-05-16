@@ -1,13 +1,51 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiRequest } from '@/lib/api';
 import styles from './page.module.css';
 
 export default function UsersPage() {
-  // Mock data
-  const users = [
-    { id: 1, name: 'Admin User', email: 'admin@akrsmart.com', role: 'ADMIN', lastActive: '2 mins ago' },
-    { id: 2, name: 'Sarah Connor', email: 'sarah@akrsmart.com', role: 'AGENT', lastActive: '1 hour ago' },
-    { id: 3, name: 'John Doe', email: 'john@akrsmart.com', role: 'AGENT', lastActive: '2 days ago' },
-  ];
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user.role !== 'ADMIN') {
+          router.push('/dashboard');
+          return;
+        }
+      }
+
+      const data = await apiRequest('/users');
+      if (data) setUsers(data);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+      try {
+        await apiRequest(`/users/${id}`, { method: 'DELETE' });
+        fetchUsers();
+      } catch (err) {
+        console.error("Failed to delete user:", err);
+      }
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -35,7 +73,9 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {loading ? (
+              <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>Loading...</td></tr>
+            ) : users.map((user) => (
               <tr key={user.id}>
                 <td className={styles.userName}>
                   <div className={styles.userCell}>
@@ -49,11 +89,13 @@ export default function UsersPage() {
                     {user.role}
                   </span>
                 </td>
-                <td className={styles.lastActive}>{user.lastActive}</td>
+                <td className={styles.lastActive}>{user.lastActive || 'N/A'}</td>
                 <td>
                   <div className={styles.actions}>
-                    <button className={styles.actionBtn}>✏️</button>
-                    <button className={styles.actionBtn}>🗑️</button>
+                    <Link href={`/users/edit/${user.id}`}>
+                      <button className={styles.actionBtn}>✏️</button>
+                    </Link>
+                    <button className={styles.actionBtn} onClick={() => handleDelete(user.id)}>🗑️</button>
                   </div>
                 </td>
               </tr>

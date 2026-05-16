@@ -1,12 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequest } from '@/lib/api';
-import styles from './new.module.css';
+import styles from '../../new/new.module.css'; // Reuse styles from new page
 
-export default function NewAppointmentPage() {
+export default function EditAppointmentPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { id } = use(params);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     clientName: '',
     email: '',
@@ -14,8 +16,35 @@ export default function NewAppointmentPage() {
     service: '',
     date: '',
     time: '',
-    notes: ''
+    notes: '',
+    status: 'PENDING'
   });
+
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      try {
+        const data = await apiRequest(`/appointments/${id}`);
+        if (data) {
+          setFormData({
+            clientName: data.clientName || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            service: data.service || '',
+            date: data.date || '',
+            time: data.time || '',
+            notes: data.notes || '',
+            status: data.status || 'PENDING'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch appointment', error);
+        alert('Failed to load appointment details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointment();
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,23 +53,27 @@ export default function NewAppointmentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiRequest('/appointments', {
-        method: 'POST',
+      await apiRequest(`/appointments/${id}`, {
+        method: 'PUT',
         body: JSON.stringify(formData)
       });
       router.push('/appointments');
     } catch (error) {
-      console.error('Failed to create appointment', error);
-      alert('Failed to create appointment');
+      console.error('Failed to update appointment', error);
+      alert('Failed to update appointment');
     }
   };
+
+  if (loading) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>New Appointment</h1>
-          <p className={styles.subtitle}>Schedule a new meeting.</p>
+          <h1 className={styles.title}>Edit Appointment</h1>
+          <p className={styles.subtitle}>Update existing meeting details.</p>
         </div>
         <Link href="/appointments" className={styles.backLink}>
           ← Back to list
@@ -52,17 +85,17 @@ export default function NewAppointmentPage() {
           <div className={styles.grid}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>Client Name *</label>
-              <input type="text" name="clientName" value={formData.clientName} onChange={handleChange} className={styles.input} required placeholder="Jane Doe" />
+              <input type="text" name="clientName" value={formData.clientName} onChange={handleChange} className={styles.input} required />
             </div>
             
             <div className={styles.inputGroup}>
               <label className={styles.label}>Email Address *</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} className={styles.input} required placeholder="jane@example.com" />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} className={styles.input} required />
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Phone Number</label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={styles.input} placeholder="+1 (555) 000-0000" />
+              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={styles.input} />
             </div>
 
             <div className={styles.inputGroup}>
@@ -84,18 +117,27 @@ export default function NewAppointmentPage() {
               <label className={styles.label}>Time *</label>
               <input type="time" name="time" value={formData.time} onChange={handleChange} className={styles.input} required />
             </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>Status *</label>
+              <select name="status" value={formData.status} onChange={handleChange} className={styles.select} required>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
           </div>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Additional Notes</label>
-            <textarea name="notes" value={formData.notes} onChange={handleChange} className={styles.textarea} rows={4} placeholder="Any special requirements..."></textarea>
+            <textarea name="notes" value={formData.notes} onChange={handleChange} className={styles.textarea} rows={4}></textarea>
           </div>
 
           <div className={styles.formActions}>
             <Link href="/appointments">
               <button type="button" className={styles.cancelBtn}>Cancel</button>
             </Link>
-            <button type="submit" className="btn-primary">Save Appointment</button>
+            <button type="submit" className="btn-primary">Update Appointment</button>
           </div>
         </form>
       </div>

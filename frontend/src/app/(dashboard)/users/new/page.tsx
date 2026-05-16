@@ -1,7 +1,37 @@
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiRequest } from '@/lib/api';
 import styles from './new.module.css';
 
 export default function NewUserPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: 'AGENT',
+    password: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await apiRequest('/users', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      });
+      router.push('/users');
+    } catch (error) {
+      console.error('Failed to create user', error);
+      alert('Failed to create user');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -15,21 +45,21 @@ export default function NewUserPage() {
       </div>
 
       <div className={`glass ${styles.formCard}`}>
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.grid}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>Full Name *</label>
-              <input type="text" className={styles.input} required placeholder="John Doe" />
+              <input type="text" name="name" value={formData.name} onChange={handleChange} className={styles.input} required placeholder="John Doe" />
             </div>
             
             <div className={styles.inputGroup}>
               <label className={styles.label}>Email Address *</label>
-              <input type="email" className={styles.input} required placeholder="john@example.com" />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} className={styles.input} required placeholder="john@example.com" />
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Role *</label>
-              <select className={styles.select} required defaultValue="AGENT">
+              <select name="role" value={formData.role} onChange={handleChange} className={styles.select} required>
                 <option value="AGENT">Agent</option>
                 <option value="ADMIN">Administrator</option>
               </select>
@@ -37,7 +67,7 @@ export default function NewUserPage() {
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Temporary Password *</label>
-              <input type="password" className={styles.input} required />
+              <input type="password" name="password" value={formData.password} onChange={handleChange} className={styles.input} required />
             </div>
           </div>
 
